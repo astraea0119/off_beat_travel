@@ -4,8 +4,9 @@ import pydeck as pdk
 from urllib.parse import urlencode
 ITS_API_KEY = st.secrets["ITS_API_KEY"]
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
-now = datetime.now()
+now = datetime.now(ZoneInfo("Asia/Seoul"))
 
 visit_date = now.strftime("%Y-%m-%d")
 visit_time = now.strftime("%H:%M")
@@ -399,7 +400,7 @@ def save_latest_traffic_snapshot(
     )
 
     snapshot_to_save["snapshot_saved_at"] = (
-        datetime.now().strftime(
+        datetime.now(ZoneInfo("Asia/Seoul")).strftime(
             "%Y-%m-%d %H:%M:%S"
         )
     )
@@ -752,12 +753,12 @@ def calculate_traffic_data_age_hours(
         traffic_dt = datetime.strptime(
             str(stat_dt),
             "%Y%m%d%H"
-        )
+        ).replace(tzinfo=ZoneInfo("Asia/Seoul"))
 
     except (ValueError, TypeError):
         return None
 
-    age_delta = datetime.now() - traffic_dt
+    age_delta = datetime.now(ZoneInfo("Asia/Seoul")) - traffic_dt
 
     return max(
         0.0,
