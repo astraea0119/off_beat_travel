@@ -217,6 +217,8 @@ def fetch_hourly_traffic(
     response.raise_for_status()
 
     data = response.json()
+    
+    print(f"[ITS DEBUG] status={response.status_code}, result={data.get('result')}, info_cnt={len(data.get('info', []))}, keys={list(data.keys())}")
 
     if data.get("result") != "success":
         return {
