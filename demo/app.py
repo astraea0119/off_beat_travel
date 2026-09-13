@@ -1514,6 +1514,7 @@ if selected_place:
         f"live_heatmap_rows={len(live_heatmap_data)} | "
         f"heatmap_saved={live_heatmap_saved} | "
         f"heatmap_error={live_heatmap_error}"
+        f"traffic_error={traffic_error_message}"
     )
 
     if not live_heatmap_data.empty:
