@@ -1490,7 +1490,7 @@ if selected_place:
 
 
 
-    if False:
+    if initial_cache_is_usable:
         current_traffic = initial_cached_traffic["data"]
         traffic_stat_dt = initial_cached_traffic["stat_dt"]
         traffic_data_source = "cache"
