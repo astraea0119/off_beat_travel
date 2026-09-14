@@ -1423,7 +1423,25 @@ if selected_place:
                 )
             )
 
-            if cached_traffic_result["available"]:
+            cached_traffic_age_hours = (
+                calculate_traffic_data_age_hours(
+                    cached_traffic_result["stat_dt"]
+                )
+            )
+
+            cached_traffic_freshness = (
+                classify_traffic_data_freshness(
+                    cached_traffic_age_hours
+                )
+            )
+
+            cached_traffic_is_usable = (
+                cached_traffic_result["available"]
+                and cached_traffic_freshness
+                in ["recent", "stale"]
+            )
+
+            if cached_traffic_is_usable:
                 current_traffic = (
                     cached_traffic_result["data"]
                 )
