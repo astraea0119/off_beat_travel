@@ -297,18 +297,6 @@ def diagnose_its_network():
 
     return result
 
-its_network_diagnostic = diagnose_its_network()
-
-st.warning(
-    "ITS NETWORK DIAGNOSTIC | "
-    f"DNS={its_network_diagnostic['dns']} "
-    f"({its_network_diagnostic['dns_detail']}) | "
-    f"TCP={its_network_diagnostic['tcp']} "
-    f"({its_network_diagnostic['tcp_detail']}) | "
-    f"HTTP={its_network_diagnostic['http']} "
-    f"({its_network_diagnostic['http_detail']})"
-)
-
 def fetch_hourly_traffic(
     visit_date,
     visit_time
