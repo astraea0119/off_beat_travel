@@ -190,7 +190,124 @@ def get_day_type(visit_date):
     return "평일"
     
 import requests
+import socket
+import time
 
+
+def diagnose_its_network():
+    host = "api.jejuits.go.kr"
+    port = 80
+    url = "http://api.jejuits.go.kr/api/getFrafficInfo"
+
+    result = {
+        "dns": "미확인",
+        "dns_detail": "",
+        "tcp": "미확인",
+        "tcp_detail": "",
+        "http": "미확인",
+        "http_detail": ""
+    }
+
+    # 1. DNS
+    try:
+        addresses = socket.getaddrinfo(
+            host,
+            port,
+            type=socket.SOCK_STREAM
+        )
+
+        resolved_ips = sorted(
+            {
+                item[4][0]
+                for item in addresses
+                if item[4]
+            }
+        )
+
+        if resolved_ips:
+            result["dns"] = "성공"
+            result["dns_detail"] = ", ".join(
+                resolved_ips
+            )
+        else:
+            result["dns"] = "실패"
+            result["dns_detail"] = "IP 주소를 찾지 못함"
+
+    except Exception as error:
+        result["dns"] = "실패"
+        result["dns_detail"] = (
+            f"{type(error).__name__}: {error}"
+        )
+
+    # 2. TCP
+    if result["dns"] == "성공":
+        try:
+            start_time = time.perf_counter()
+
+            with socket.create_connection(
+                (host, port),
+                timeout=10
+            ):
+                elapsed = (
+                    time.perf_counter()
+                    - start_time
+                )
+
+            result["tcp"] = "성공"
+            result["tcp_detail"] = (
+                f"{elapsed:.2f}초"
+            )
+
+        except Exception as error:
+            result["tcp"] = "실패"
+            result["tcp_detail"] = (
+                f"{type(error).__name__}: {error}"
+            )
+
+    # 3. HTTP
+    if result["tcp"] == "성공":
+        try:
+            start_time = time.perf_counter()
+
+            response = requests.get(
+                url,
+                params={
+                    "type": "L"
+                },
+                timeout=10
+            )
+
+            elapsed = (
+                time.perf_counter()
+                - start_time
+            )
+
+            result["http"] = (
+                f"응답 {response.status_code}"
+            )
+            result["http_detail"] = (
+                f"{elapsed:.2f}초"
+            )
+
+        except Exception as error:
+            result["http"] = "실패"
+            result["http_detail"] = (
+                f"{type(error).__name__}: {error}"
+            )
+
+    return result
+
+its_network_diagnostic = diagnose_its_network()
+
+st.warning(
+    "ITS NETWORK DIAGNOSTIC | "
+    f"DNS={its_network_diagnostic['dns']} "
+    f"({its_network_diagnostic['dns_detail']}) | "
+    f"TCP={its_network_diagnostic['tcp']} "
+    f"({its_network_diagnostic['tcp_detail']}) | "
+    f"HTTP={its_network_diagnostic['http']} "
+    f"({its_network_diagnostic['http_detail']})"
+)
 
 def fetch_hourly_traffic(
     visit_date,
@@ -1344,6 +1461,8 @@ else:
 
     active_heatmap_reference_time = None
 
+traffic_error_message = None
+
 if selected_place:
     initial_cached_traffic = (
         load_latest_traffic_snapshot(
@@ -1531,7 +1650,7 @@ if selected_place:
         f"coordinate={traffic_coordinate_available} | "
         f"live_heatmap_rows={len(live_heatmap_data)} | "
         f"heatmap_saved={live_heatmap_saved} | "
-        f"heatmap_error={live_heatmap_error}"
+        f"heatmap_error={live_heatmap_error} | "
         f"traffic_error={traffic_error_message}"
     )
 
