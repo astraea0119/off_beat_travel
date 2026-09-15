@@ -2,7 +2,10 @@ import streamlit as st
 import pandas as pd
 import pydeck as pdk
 from urllib.parse import urlencode
-ITS_API_KEY = st.secrets["ITS_API_KEY"]
+try:
+    ITS_API_KEY = st.secrets["ITS_API_KEY"]
+except Exception:
+    ITS_API_KEY = ""
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -309,6 +312,15 @@ def fetch_hourly_traffic(
     stat_dt = visit_dt.strftime(
         "%Y%m%d%H"
     )
+
+    if not ITS_API_KEY:
+        return {
+            "available": False,
+            "stat_dt": stat_dt,
+            "result": "secret_unavailable",
+            "info_cnt": 0,
+            "data": pd.DataFrame()
+        }
 
     response = requests.get(
         "http://api.jejuits.go.kr/api/getFrafficInfo",
