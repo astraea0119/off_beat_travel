@@ -1628,19 +1628,7 @@ if selected_place:
             )
         )
 
-    st.warning(
-        "DEBUG | "
-        f"source={traffic_data_source} | "
-        f"stat={traffic_stat_dt} | "
-        f"freshness={traffic_data_freshness} | "
-        f"current_rows={len(current_traffic)} | "
-        f"baseline={traffic_baseline_available} | "
-        f"coordinate={traffic_coordinate_available} | "
-        f"live_heatmap_rows={len(live_heatmap_data)} | "
-        f"heatmap_saved={live_heatmap_saved} | "
-        f"heatmap_error={live_heatmap_error} | "
-        f"traffic_error={traffic_error_message}"
-    )
+
 
     if not live_heatmap_data.empty:
         active_heatmap_data = (
